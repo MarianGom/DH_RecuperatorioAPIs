@@ -5,7 +5,14 @@ const { validationResult } = require('express-validator');
 const cancionControllerApi = {
     list: async (req, res) => {
         try{
-            const cancionesList = await db.Canciones.findAll()
+            const cancionesList = await db.Canciones.findAll({
+                include: [
+                    
+                { model: db.Generos, as: 'genero', attributes: ['name'] },
+                { model: db.Albumes, as: 'album', attributes: ['nombre'] },
+                { model: db.Artistas, as: 'artista', attributes: ['nombre'] }
+                ]
+            })
             const respuesta = {
                 meta: {
                     status: 200,
@@ -25,7 +32,15 @@ const cancionControllerApi = {
     
     detail: async (req, res) => {
         try{
-            const cancion = await db.Canciones.findByPk(req.params.id);
+            const cancion = await db.Canciones.findByPk(req.params.id,{
+                include: [
+                    
+                    { model: db.Generos, as: 'genero', attributes: ['name'] },
+                    { model: db.Albumes, as: 'album', attributes: ['nombre'] },
+                    { model: db.Artistas, as: 'artista', attributes: ['nombre'] }
+                    ]
+            });
+            
             if (!cancion) {
                 return res.status(404).json({status: 404, error: 'Canción no encontrada' });
             }
